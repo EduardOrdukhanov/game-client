@@ -1,21 +1,27 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import Canvas from './Canvas/Canvas'
+import { withStyles } from '@material-ui/core/styles'
 
 class App extends Component {
   render() {
+    const { classes } = this.props
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
-        </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
+      <div className={classes.App}>
+        <Canvas/>
       </div>
     );
   }
 }
 
-export default App;
+const styles = theme => {
+  return {
+    App: {
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center'
+    }
+  }
+}
+
+export default withStyles(styles)(App)
