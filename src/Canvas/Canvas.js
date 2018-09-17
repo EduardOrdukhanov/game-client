@@ -1,5 +1,6 @@
 import React from 'react'
 import { withStyles } from '@material-ui/core/styles'
+import io from 'socket.io-client'
 import Menu from '../Menu/Menu'
 
 class Canvas extends React.Component {
@@ -8,7 +9,9 @@ class Canvas extends React.Component {
     this.state = {
       mouseDown: false,
       clientX: 0,
-      clientY: 0
+      clientY: 0,
+      broadcasts: [],
+      canvasData: ''
     }
   }
 
@@ -20,18 +23,55 @@ class Canvas extends React.Component {
     this.ctx.lineWidth = 2
     this.ctx.translate(0.5, 0.5)
     //this.ctx.strokeText("Hello World", 10, 50);
+    this.socket = io('http://localhost:8080')
+    this.socket.on('from_server', data => {
+      console.log(data.payload)
+      this.drawImage(data.payload)
+    })
+    this.socket.on('broadcast', data => {
+      this.setState({
+        broadcasts: this.state.broadcasts.concat([data])
+      })
+    })
+  }
+
+  drawImage = payload => {
+    let ctx = this.ctx
+    let clear = this.clearCanvas
+    let imageObj = new Image()
+    imageObj.onload = function() {
+      clear()
+      ctx.drawImage(this, 0, 0)
+    }
+    imageObj.src = payload;
+  }
+
+  clearCanvas = () => {
+    this.ctx.clearRect(0, 0, this.refs.canvas.width, this.refs.canvas.height)
+  }
+
+  drawLine = e => {
+    const { x, y } = this.getXY(e)
+    this.ctx.lineTo(x, y)
+    this.ctx.stroke()
+  }
+
+  setXY = (coordinates) => {
+    this.setState({
+      clientX: Math.abs(Math.floor(coordinates.x)),
+      clientY: Math.abs(Math.floor(coordinates.y))
+    })
   }
 
   handleMouseMove = e => {
-    const {x, y} = this.getXY(e)
-    this.setState({
-      clientX: Math.abs(Math.floor(x)),
-      clientY: Math.abs(Math.floor(y))
-    })
+    const coordinates = this.getXY(e)
+    this.setXY(coordinates)
     if(this.state.mouseDown){
       //this.ctx.fillRect(e.pageX - this.refs.canvas.getBoundingClientRect().left,e.pageY - this.refs.canvas.getBoundingClientRect().top,1,1)
-      this.ctx.lineTo(x, y)
-      this.ctx.stroke()
+      this.drawLine(e)
+      this.socket.emit('to_server', {
+        payload: this.refs.canvas.toDataURL()
+      })
     }
   }
 
@@ -76,6 +116,13 @@ class Canvas extends React.Component {
     const { classes } = this.props
     return (
       <div className={classes.canvasContainer}>
+        <div className={classes.serverChat}>
+          {this.state.broadcasts.map((message, i) => (
+            <div key={i} style={{color: message.type === 'connect' ? 'green' : message.type === 'disconnect' ? 'red' : 'black'}}>
+              {message.payload}
+            </div>
+          ))}
+        </div>
         <div>
           {`X = ${this.state.clientX}`}<br/>{`Y = ${this.state.clientY}`}
         </div>
@@ -106,8 +153,14 @@ const styles = theme => {
     },
     canvas:{
       border: '1px solid black',
-      height: '1000px',
-      width: '1000px'
+      //height: '1000px',
+      //width: '1000px'
+    },
+    serverChat: {
+      border: '1px solid black',
+      padding: '5px',
+      overflowY: 'auto',
+      maxHeight: '100px'
     }
   }
 }
