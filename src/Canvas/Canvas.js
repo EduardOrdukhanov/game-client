@@ -1,7 +1,9 @@
 import React from 'react'
 import { withStyles } from '@material-ui/core/styles'
-import io from 'socket.io-client'
 import Menu from '../Menu/Menu'
+
+import { connect } from 'react-redux'
+import { compose } from 'redux'
 
 class Canvas extends React.Component {
   constructor(props){
@@ -23,12 +25,13 @@ class Canvas extends React.Component {
     this.ctx.lineWidth = 2
     this.ctx.translate(0.5, 0.5)
     //this.ctx.strokeText("Hello World", 10, 50);
-    this.socket = io('http://localhost:8080')
-    this.socket.on('from_server', data => {
+    /*
+    this.props.socketInstance.on('from_server', data => {
       console.log(data.payload)
       this.drawImage(data.payload)
     })
-    this.socket.on('broadcast', data => {
+    */
+    this.props.socketInstance.on('broadcast', data => {
       this.setState({
         broadcasts: this.state.broadcasts.concat([data])
       })
@@ -67,11 +70,12 @@ class Canvas extends React.Component {
     const coordinates = this.getXY(e)
     this.setXY(coordinates)
     if(this.state.mouseDown){
-      //this.ctx.fillRect(e.pageX - this.refs.canvas.getBoundingClientRect().left,e.pageY - this.refs.canvas.getBoundingClientRect().top,1,1)
       this.drawLine(e)
-      this.socket.emit('to_server', {
+      /*
+      this.props.socketInstance.emit('to_server', {
         payload: this.refs.canvas.toDataURL()
       })
+      */
     }
   }
 
@@ -130,7 +134,7 @@ class Canvas extends React.Component {
         <canvas 
           ref='canvas' 
           width='1000'
-          height='1000'
+          height='1200'
           className={classes.canvas} 
           onMouseMove={this.handleMouseMove}
           onMouseDown={this.handleMouseDown}
@@ -165,4 +169,18 @@ const styles = theme => {
   }
 }
 
-export default withStyles(styles)(Canvas)
+const mapStateToProps = state => ({
+  socketInstance: state.socketInstance
+})
+
+const mapDispatchToProps = dispatch => ({})
+
+export default compose(
+  withStyles(styles, {
+    name: 'Canvas'
+  }),
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )
+)(Canvas)

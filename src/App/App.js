@@ -1,14 +1,19 @@
 import React, { Component } from 'react';
-import Canvas from './Canvas/Canvas'
+import Canvas from '../Canvas/Canvas'
+import { connect } from 'react-redux'
+import { compose } from 'redux'
 import { withStyles } from '@material-ui/core/styles'
 import io from 'socket.io-client'
-import Home from './Home/Home'
+import Home from '../Home/Home'
+import { initSocket } from './actions'
 import { Switch, Route, Redirect } from 'react-router-dom'
 
 class App extends Component {
   
-  componentWillMount(){
-    //this.socket = io('http://localhost:8080')
+  componentDidMount(){
+    const { initSocket } = this.props
+    let socket = io('http://localhost:8080')
+    initSocket(socket)
   }
 
   render() {
@@ -35,4 +40,20 @@ const styles = theme => {
   }
 }
 
-export default withStyles(styles)(App)
+const mapStateToProps = state => ({
+  socketInstance: state.socketInstance
+})
+
+const mapDispatchToProps = dispatch => ({
+  initSocket: socket => dispatch(initSocket(socket))
+})
+
+export default compose(
+  withStyles(styles, {
+    name: 'App'
+  }),
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )
+)(App)
