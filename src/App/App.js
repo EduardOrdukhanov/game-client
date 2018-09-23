@@ -5,6 +5,7 @@ import { compose } from 'redux'
 import { withStyles } from '@material-ui/core/styles'
 import io from 'socket.io-client'
 import Home from '../Home/Home'
+import CreateRoom from '../CreateRoom/CreateRoom'
 import { initSocket } from './actions'
 import { Switch, Route, Redirect } from 'react-router-dom'
 
@@ -22,7 +23,7 @@ class App extends Component {
       <div className={classes.App}>
         <Switch>
           <Route exact path='/' component={Home}/>
-          <Route exact path='/canvas' component={Canvas}/>
+          <Route exact path='/canvas' render={ props => this.props.socketInstance && <Canvas/>}/>
         </Switch>
       </div>
     );
@@ -35,7 +36,8 @@ const styles = theme => {
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
-      justifyContent: 'center'
+      justifyContent: 'center',
+      height: '100vh'
     }
   }
 }

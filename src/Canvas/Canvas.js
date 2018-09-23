@@ -5,6 +5,16 @@ import Menu from '../Menu/Menu'
 import { connect } from 'react-redux'
 import { compose } from 'redux'
 
+
+//Useful code
+/*
+var canvas = document.createElement('canvas');
+canvas.width = desiredWidth;
+canvas.height = desiredHeight;
+canvas.getContext('2d').drawImage(originalCanvas,x,y,w,h,0,0,desiredWidth, desiredHeight);
+result = canvas.toDataURL()
+*/
+
 class Canvas extends React.Component {
   constructor(props){
     super(props)

@@ -2,50 +2,48 @@ import React from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import TextField from '@material-ui/core/TextField'
 import Button from '@material-ui/core/Button'
+import Typography from '@material-ui/core/Typography'
 import Paper from '@material-ui/core/Paper'
 import { connect } from 'react-redux'
 import { compose } from 'redux'
 
-class CreateRoom extends React.Component {
+class RoomList extends React.Component {
 
   constructor(props){
     super(props)
     this.state = {
-      room: ''
+      rooms: null
     }
   }
-  
-  handleChange = room => event => {
-    this.setState({
-      [room]: event.target.value
+
+  componentDidMount(){
+    this.props.socketInstance.on('room_update', data => {
+      this.setState({
+        rooms: data
+      })
     })
+    this.props.socketInstance.emit('get_rooms')
   }
 
-  handleSubmit = e => {
-    this.props.socketInstance.emit('create_room', this.state.room)
+  renderRooms = () => {
+    const { classes } = this.props
+    if(this.state.rooms){
+      return this.state.rooms.map((room, i) => (
+        <Paper key={i} className={classes.roomItem}>
+          {room}
+        </Paper>
+      ))
+    }
   }
 
   render(){
     const { classes } = this.props
     return (
       <Paper className={classes.createRoomContainer}>
-        <TextField
-          id="room"
-          label="Room name"
-          className={classes.textField}
-          value={this.state.name}
-          onChange={this.handleChange('room')}
-          margin="normal"
-        />
-        {this.props.socketInstance ?
-        <Button onClick={this.handleSubmit} color='primary' variant='contained'> 
-          Create room
-        </Button>
-        :
-        <Button disabled>
-          Create room
-        </Button>
-        }
+        <Typography variant='headline'>
+          Room list
+        </Typography>
+        {this.renderRooms()}
       </Paper>
     )
   }
@@ -57,8 +55,12 @@ const styles = theme => {
       display: 'flex',
       flexDirection: 'column',
       padding: '10px',
+      margin: '20px',
       alignItems: 'center',
       justifyContent: 'center'
+    },
+    roomItem: {
+      margin: '2px'
     }
   }
 }
@@ -71,10 +73,10 @@ const mapDispatchToProps = dispatch => ({})
 
 export default compose(
   withStyles(styles, {
-    name: 'CreateRoom'
+    name: 'RoomList'
   }),
   connect(
     mapStateToProps,
     mapDispatchToProps
   )
-)(CreateRoom)
+)(RoomList)
