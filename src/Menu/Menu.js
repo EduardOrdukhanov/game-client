@@ -44,9 +44,6 @@ const styles = theme => {
       display: 'block'
     },
     menuContainer: {
-      display: 'flex',
-      flexDirection: 'row',
-      alignItems: 'center'
     },
     eraser: {
     },

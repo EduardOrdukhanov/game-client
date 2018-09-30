@@ -1,15 +1,17 @@
 import React from 'react'
-import App from './App'
+import App from './App/App'
 import { Provider } from 'react-redux'
-import { createStore } from 'redux'
-import rootReducer from './store'
+import { BrowserRouter } from 'react-router-dom'
+import configureStore from './store/configureStore'
 
-const store = createStore(rootReducer)
+const store = configureStore()
 
 const Root = () => {
   return (
     <Provider store = {store}>
-      <App/>
+      <BrowserRouter>
+        <App/>
+      </BrowserRouter>
     </Provider>
   )
 }
