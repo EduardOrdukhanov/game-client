@@ -4,6 +4,7 @@ import TextField from '@material-ui/core/TextField'
 import Button from '@material-ui/core/Button'
 import Typography from '@material-ui/core/Typography'
 import Paper from '@material-ui/core/Paper'
+import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { compose } from 'redux'
 
@@ -28,10 +29,14 @@ class RoomList extends React.Component {
   renderRooms = () => {
     const { classes } = this.props
     if(this.state.rooms){
-      return this.state.rooms.map((room, i) => (
-        <Paper key={i} className={classes.roomItem}>
-          {room}
-        </Paper>
+      console.log(JSON.stringify(this.state.rooms))
+      const rooms = this.state.rooms
+      return Object.keys(rooms).map(key => (
+        <Link to={`/canvas/${key}`} key={key} id={key}>
+          <Paper className={classes.roomItem}>
+            {rooms[key].name}
+          </Paper>
+        </Link>
       ))
     }
   }
@@ -60,7 +65,11 @@ const styles = theme => {
       justifyContent: 'center'
     },
     roomItem: {
-      margin: '2px'
+      margin: '2px',
+      '&:hover': {
+        cursor: 'pointer',
+        backgroundColor: 'grey'
+      }
     }
   }
 }

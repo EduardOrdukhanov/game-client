@@ -5,9 +5,9 @@ import { compose } from 'redux'
 import { withStyles } from '@material-ui/core/styles'
 import io from 'socket.io-client'
 import Home from '../Home/Home'
-import CreateRoom from '../CreateRoom/CreateRoom'
 import { initSocket } from './actions'
 import { Switch, Route, Redirect } from 'react-router-dom'
+import { withRouter } from 'react-router'
 
 class App extends Component {
   
@@ -23,7 +23,7 @@ class App extends Component {
       <div className={classes.App}>
         <Switch>
           <Route exact path='/' component={Home}/>
-          <Route exact path='/canvas' render={ props => this.props.socketInstance && <Canvas/>}/>
+          <Route exact path='/canvas/:id' render={ props => this.props.socketInstance && <Canvas {...props}/>}/>
         </Switch>
       </div>
     );
@@ -51,6 +51,7 @@ const mapDispatchToProps = dispatch => ({
 })
 
 export default compose(
+  withRouter,
   withStyles(styles, {
     name: 'App'
   }),

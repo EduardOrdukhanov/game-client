@@ -41,6 +41,8 @@ class Canvas extends React.Component {
       this.drawImage(data.payload)
     })
     */
+    console.log(JSON.stringify(this.props.match.params.id))
+    this.props.socketInstance.emit('join_room', this.props.match.params.id)
     this.props.socketInstance.on('broadcast', data => {
       this.setState({
         broadcasts: this.state.broadcasts.concat([data])
@@ -174,7 +176,7 @@ const styles = theme => {
       border: '1px solid black',
       padding: '5px',
       overflowY: 'auto',
-      maxHeight: '100px'
+      minHeight: '100px'
     }
   }
 }
